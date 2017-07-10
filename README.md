@@ -13,6 +13,11 @@ haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
 
 in several R projects. It might be easier to just type `lalonde::nsw_dw`.
 
+Data Source
+===========
+
+-   All the datasets are available in `txt` and `dta` format from Dehejia's [website](http://users.nber.org/~rdehejia/nswdata2.html)
+
 Installation
 ============
 
