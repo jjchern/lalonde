@@ -1,6 +1,6 @@
 Package: lalonde
 Title: The Lalonde Datasets
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 'JJ Chen <jiajia.chern@gmail.com> [aut, cre]'
 Description: An R data package for the Lalonde dataset.
 Depends:
