@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jjchern/lalonde?branch=master&svg=true)](https://ci.appveyor.com/project/jjchern/lalonde)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/lalonde)](https://cran.r-project.org/package=lalonde)
 
-The Lalonde datasets are widely used in the causal inference literature. The current package aims for easing the process of loading such datasets in R. I found myself calling the following command 
+The Lalonde datasets are widely used in the causal inference literature. The current package makes loading such datasets in R easier. I found myself calling the following command 
 
 ```R
 haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
@@ -28,7 +28,23 @@ haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
 
 in several R projects. It might be easier to just type `lalonde::nsw_dw`.
 
-# Data Source
+# Data and Source
+
+- NSW Data Files (Lalonde Sample)
+    - `lalonde::nsw`
+    - These files contain the treated and control units from the male sub-sample from the National Supported Work Demonstration as used by Lalonde in his paper.
+    
+- NSW Data Files (Dehejia-Wahha Sample)
+    - `lalonde::nsw_dw`
+    - Based on pre-intervention variables, Dehejia-Wahha extract a further subset of Lalonde's NSW experimental data, a subset containing information on RE74 (earnings in 1974).
+    
+- Non-experimental Comparison Data Files:
+    - `lalonde::psid_controls`
+    - `lalonde::psid_controls2`
+    - `lalonde::psid_controls3`   
+    - `lalonde::cps_controls`
+    - `lalonde::cps_controls2`
+    - `lalonde::cps_controls3`    
 
 - All the datasets are available in `txt` and `dta` format from Dehejia's [website](http://users.nber.org/~rdehejia/nswdata2.html)
 
@@ -49,5 +65,13 @@ library(tidyverse)
 lalonde::nsw
 
 lalonde::nsw_dw
+```
+
+Combine the treatment group from `lalonde::nsw_dw` with a non-experimental comparison group from the Panel Study of Income Dynamics (PSID):
+
+```{r}
+lalonde::nsw_dw %>% 
+    filter(treat == 1) %>% 
+    bind_rows(lalonde::psid_controls)
 ```
 
