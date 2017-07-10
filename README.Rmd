@@ -1,0 +1,30 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# About `lalonde`
+
+The `lalonde` datasets are widely used in the causal inference literature. I found myself calling the following command 
+
+```R
+haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
+```
+
+in several R projects. I though it might be easier to just type `lalonde::nsw_dw`. The cuurent package `lalonde` aims for easing the process of loading the datasets in R.
+
+# Installation
+
+```R
+# install.packages("devtools")
+devtools::install_github("jjchern/lalonde")
+```
