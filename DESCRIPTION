@@ -1,7 +1,7 @@
 Package: lalonde
 Title: The Lalonde Datasets
 Version: 1.0.0
-Authors@R: 'JJ Chen <jiajia.chern@gmail.com> [aut, cre]'
+Authors@R: c(person("JJ", "Chen", , "jiajia.chern@gmail.com", c("aut", "cre")))
 Description: An R data package for the Lalonde dataset.
 Depends:
     R (>= 3.0.0)
