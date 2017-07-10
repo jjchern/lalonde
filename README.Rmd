@@ -8,19 +8,26 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "README-",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
-# About `lalonde`
 
-The `lalonde` datasets are widely used in the causal inference literature. I found myself calling the following command 
+# About `lalonde` 
+
+[![Travis-CI Build Status](https://travis-ci.org/jjchern/lalonde.svg?branch=master)](https://travis-ci.org/jjchern/lalonde)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jjchern/lalonde?branch=master&svg=true)](https://ci.appveyor.com/project/jjchern/lalonde)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/lalonde)](https://cran.r-project.org/package=lalonde)
+
+The Lalonde datasets are widely used in the causal inference literature. The current package aims for easing the process of loading such datasets in R. I found myself calling the following command 
 
 ```R
 haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
 ```
 
-in several R projects. I though it might be easier to just type `lalonde::nsw_dw`. The cuurent package `lalonde` aims for easing the process of loading the datasets in R.
+in several R projects. It might be easier to just type `lalonde::nsw_dw`.
 
 # Installation
 
@@ -28,3 +35,16 @@ in several R projects. I though it might be easier to just type `lalonde::nsw_dw
 # install.packages("devtools")
 devtools::install_github("jjchern/lalonde")
 ```
+
+# Usage
+
+The datasets print nicely in the tidyverse:
+
+```{r}
+library(tidyverse)
+
+lalonde::nsw
+
+lalonde::nsw_dw
+```
+
