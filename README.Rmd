@@ -1,16 +1,19 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-",
-  warning = FALSE,
-  message = FALSE
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 ``` 
 
@@ -20,7 +23,9 @@ knitr::opts_chunk$set(
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jjchern/lalonde?branch=master&svg=true)](https://ci.appveyor.com/project/jjchern/lalonde)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/lalonde)](https://cran.r-project.org/package=lalonde)
 
-The Lalonde datasets are widely used in the causal inference literature. The current package makes loading such datasets in R easier. I found myself calling the following command 
+The Lalonde datasets are widely used in the causal inference literature. 
+The current package makes loading such datasets in R easier. I found myself 
+calling the following command 
 
 ```R
 haven::read_dta("http://www.nber.org/~rdehejia/data/nsw_dw.dta")
@@ -67,11 +72,91 @@ lalonde::nsw
 lalonde::nsw_dw
 ```
 
-Combine the treatment group from `lalonde::nsw_dw` with a non-experimental comparison group from the Panel Study of Income Dynamics (PSID):
+Combine the treatment group from `lalonde::nsw_dw` with a non-experimental 
+comparison group from the Panel Study of Income Dynamics (PSID):
 
 ```{r}
 lalonde::nsw_dw %>% 
     filter(treat == 1) %>% 
-    bind_rows(lalonde::psid_controls)
+    bind_rows(lalonde::psid_controls) %>% 
+    select(-data_id) %>% 
+    print() -> df
+
+# install.packages("skimr")
+skimr::skim(df)
+```
+
+The unadjusted difference in means is -$15,205:
+
+```{r}
+df %>% 
+    group_by(treat) %>% 
+    summarise(mean_re78 = mean(re78)) %>% 
+    print() %>% 
+    spread(treat, mean_re78, sep = "_") %>% 
+    mutate(diff = treat_1 - treat_0)
+```
+
+The naive estimate is certainly biased, because the treated group looks very
+different from the control group:
+
+```{r}
+# install.packages("cem")
+cem::imbalance(group = df$treat, 
+               data  = as.data.frame(df),
+               drop  = c("treat", "re78"))
+```
+
+The multivariate imbalanced meaure is close to 1, suggesting an almost complete
+separation between the treated and control group. The differences in the 
+empirical quantiles of the two distributions also indicate a large amount of 
+imbalance for many covariates. For example, the treated group tends to be 
+younger, has fewer years of education, are less likely to be married, and earns 
+a lot less in 1974 and 1975.
+
+Matching on the covariates can help to create a matching sample in which the 
+matched control group is more comparable to the treated group. Below we call
+the `cem()` function to implement an automatic coarsened exact matching (CEM):
+
+```{r}
+cem::cem(treatment = "treat",
+         data = as.data.frame(df), 
+         verbose = TRUE, 
+         keep.all = TRUE, 
+         drop = "re78") -> cem
+cem
+```
+
+The `cem()` function includes the automatic cut points:
+
+```{r}
+cem$breaks
+```
+
+Alternatively, we can supply some infomation to aid the CEM process. For
+example, we can choose to discretize the variable `age`, `educ`, `re74`, `re75` 
+in the following way:
+
+```{r}
+cut_age = seq(min(df$age), max(df$age), by = 15)
+cut_educ = c(0, 6.5, 8.5, 12.5, 17)
+cut_re74 = seq(0, max(df$re74), by = 5000)
+cut_re75 = seq(0, max(df$re75), by = 5000)
+cem::cem(treatment = "treat",
+         data = as.data.frame(df), 
+         verbose = TRUE, 
+         keep.all = TRUE, 
+         drop = "re78",
+         cutpoints = list(age = cut_age,
+                          educcation = cut_educ,
+                          re74 = cut_re74,
+                          re75 = cut_re75)) -> mat2
+mat2
+```
+
+Is there a way to improve the number of subjects who can be matched?
+
+```{r cem-relax, message=FALSE, results='hide'}
+cem::relax.cem(obj = mat2, data = as.data.frame(df), verbose = FALSE)
 ```
 
